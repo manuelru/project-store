@@ -4,6 +4,7 @@ import { DataSource, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/user.dto';
 import { UserImage } from '../entities/user-image.entity';
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UsersService{
@@ -18,9 +19,10 @@ export class UsersService{
     ){}
 
     async create (createUserDto: CreateUserDto){
-        const {images = [], ...detailUser} = createUserDto;
+        const {images = [], password, ...detailUser} = createUserDto;
         const user = await this.userRepo.create({
             ...detailUser,
+            password: bcrypt.hashSync(password, 10),
             images:images.map((image) => this.userImageRepo.create({url:image}))
         })
 
